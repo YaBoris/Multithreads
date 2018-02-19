@@ -7,7 +7,13 @@
 
 using namespace std;
 
-vector <int> *vector_of_digits = new vector<int>;
+struct thread_data
+{
+	int prime_number;
+	int elapsed_seconds;
+};
+
+vector <thread_data> *vector_of_digits = new vector<thread_data>;
 chrono::time_point<chrono::system_clock> start, end1;
 mutex m_mutex;
 int counter = 0;
@@ -31,13 +37,17 @@ void calculation_of_simple(int digit)
 		}
 	}
 	end1 = chrono::system_clock::now();
-	int elapsed_seconds = chrono::duration_cast<chrono::nanoseconds>(end1-start).count();
+
+	thread_data data_set;
+	data_set.elapsed_seconds = chrono::duration_cast<chrono::milliseconds>(end1-start).count();
+	data_set.prime_number = digit;
+
 	if(!not_simple)
 	{
 		m_mutex.lock();
 		counter++;
-		vector_of_digits->push_back(index);
-		cout << "counter: " << counter << ". Digit: " << digit << ". Time(ms):" << elapsed_seconds <<endl;
+		vector_of_digits->push_back(data_set);
+		cout << "counter: " << counter << ". Digit: " << data_set.prime_number << ". Time(ms):" << data_set.elapsed_seconds << endl;
 		m_mutex.unlock();
 	}
 }
@@ -48,9 +58,9 @@ int main()//int argc, char *argv[]
 	vector_of_digits->resize(1000000);
 	for(int i = 3; i <= 100000; i+=2)//numeric_limits<int>::max()
 	{
+		std::this_thread::sleep_for(std::chrono::milliseconds(rand()%200));
 		thread thr(calculation_of_simple, i);
 		thr.detach();
-		std::this_thread::sleep_for(std::chrono::microseconds(rand()%100));
 	}
 	delete [] vector_of_digits;
 	return 0;
