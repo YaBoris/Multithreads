@@ -4,6 +4,7 @@
 #include <thread>
 #include <mutex>
 #include <chrono>
+#include <condition_variable>
 
 using namespace std;
 
@@ -13,6 +14,7 @@ struct thread_data
 	int elapsed_seconds;
 };
 
+//condition_variable cond_var;
 vector <thread_data> *vector_of_digits = new vector<thread_data>;
 chrono::time_point<chrono::system_clock> start, end1;
 mutex m_mutex;
@@ -63,5 +65,6 @@ int main()//int argc, char *argv[]
 		thr.detach();
 	}
 	delete [] vector_of_digits;
+
 	return 0;
 }
